@@ -34,6 +34,15 @@ public class TimeZoneInfoTests
     
     [Theory]
     [MemberData(nameof(InvalidTimeTestData))]
+    public void IsInvalidTime_WithTimeZoneInfoFix(
+        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
+    {
+        var timeZone = new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
+        timeZone.IsInvalidTime(testTime).Should().Be(expectedIsInvalid);
+    }
+    
+    [Theory]
+    [MemberData(nameof(InvalidTimeTestData))]
     public void IsInvalidTime_WithNodaDateTimeZone_WithTzDb(
         DateTime testTime, string timeZoneId, bool expectedIsInvalid)
     {
