@@ -88,6 +88,15 @@ public class TimeZoneInfoTests
     
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
+    public void IsAmbiguousTime_WithTimeZoneInfoFix(
+        DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
+    {
+        var timeZone =  new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
+        timeZone.IsAmbiguousTime(testTime).Should().Be(expectedIsAmbiguous);
+    }
+    
+    [Theory]
+    [MemberData(nameof(AmbiguousTimeTestData))]
     public void IsAmbiguousTime_WithNodaDateTimeZone_WithTzDb(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
