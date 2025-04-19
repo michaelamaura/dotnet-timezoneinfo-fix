@@ -4,8 +4,6 @@ namespace TimeZoneFix;
 
 public partial class TimeZoneInfoFix
 {
-    private readonly bool _supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime;
-
     [Flags]
     internal enum TimeZoneInfoOptions
     {
@@ -39,7 +37,8 @@ public partial class TimeZoneInfoFix
         return false;
     }
 
-    private static bool GetIsAmbiguousTime(DateTime time, TimeZoneInfo.AdjustmentRule? rule, DaylightTimeStruct daylightTime)
+    private static bool GetIsAmbiguousTime(DateTime time, TimeZoneInfo.AdjustmentRule? rule,
+        DaylightTimeStruct daylightTime)
     {
         bool isAmbiguous = false;
         if (rule == null || rule.DaylightDelta == TimeSpan.Zero)

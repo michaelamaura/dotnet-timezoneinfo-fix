@@ -2,37 +2,28 @@ using System.Diagnostics;
 
 namespace TimeZoneFix;
 
-/// <summary>
-/// This class mimics a TimeZoneInfo while fixing some of its behavior regarding IsInvalidTime.
-/// </summary>
-/// <param name="timeZone">the time zone to fix</param>
-public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
+public partial class TimeZoneInfoFix
 {
-    private readonly TimeZoneInfo.AdjustmentRule[]? _adjustmentRules = timeZone.GetAdjustmentRules();
-    private TimeSpan BaseUtcOffset => timeZone.BaseUtcOffset;
-
     public bool IsInvalidTime(DateTime dateTime)
     {
-        Console.WriteLine("Checking IsInvalidTime...");
-
         bool isInvalid = false;
 
-        // only check Unspecified and (Local when this TimeZoneInfo instance is Local)
-        TimeZoneInfo.AdjustmentRule? rule = GetAdjustmentRuleForTime(dateTime, out int? ruleIndex);
-
-        if (rule != null && rule.HasDaylightSaving())
+        if ((dateTime.Kind == DateTimeKind.Unspecified) ||
+            (dateTime.Kind == DateTimeKind.Local //&& s_cachedData.GetCorrespondingKind(this) == DateTimeKind.Local
+            ))
         {
-            Console.WriteLine($"Found adjustmentRule: {rule.ToFormattedString()}");
+            // only check Unspecified and (Local when this TimeZoneInfo instance is Local)
+            TimeZoneInfo.AdjustmentRule? rule = GetAdjustmentRuleForTime(dateTime, out int? ruleIndex);
 
-            DaylightTimeStruct daylightTime = GetDaylightTime(dateTime.Year, rule, ruleIndex);
-
-            Console.WriteLine($"DaylightTimeStruct: {daylightTime}");
-
-            isInvalid = GetIsInvalidTime(dateTime, rule, daylightTime);
-        }
-        else
-        {
-            isInvalid = false;
+            if (rule != null && rule.HasDaylightSaving())
+            {
+                DaylightTimeStruct daylightTime = GetDaylightTime(dateTime.Year, rule, ruleIndex);
+                isInvalid = GetIsInvalidTime(dateTime, rule, daylightTime);
+            }
+            else
+            {
+                isInvalid = false;
+            }
         }
 
         return isInvalid;
@@ -47,6 +38,7 @@ public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
 
         return result;
     }
+
 
     private TimeZoneInfo.AdjustmentRule? GetAdjustmentRuleForTime(DateTime dateTime, bool dateTimeisUtc,
         out int? ruleIndex)
@@ -92,6 +84,7 @@ public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
         ruleIndex = null;
         return null;
     }
+
 
     private int CompareAdjustmentRuleToDateTime(TimeZoneInfo.AdjustmentRule rule,
         TimeZoneInfo.AdjustmentRule previousRule,
@@ -176,23 +169,24 @@ public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
         TimeSpan delta = rule.DaylightDelta;
         DateTime startTime;
         DateTime endTime;
-        //if (rule.NoDaylightTransitions)
-        // {
-        //     // NoDaylightTransitions rules don't use DaylightTransition Start and End, instead
-        //     // the DateStart and DateEnd are UTC times that represent when daylight savings time changes.
-        //     // Convert the UTC times into adjusted time zone times.
-        //
-        //     // use the previous rule to calculate the startTime, since the DST change happens w.r.t. the previous rule
-        //     TimeZoneInfo.AdjustmentRule previousRule = GetPreviousAdjustmentRule(rule, ruleIndex);
-        //     startTime = ConvertFromUtc(rule.DateStart, previousRule.DaylightDelta, previousRule.BaseUtcOffsetDelta);
-        //
-        //     endTime = ConvertFromUtc(rule.DateEnd, rule.DaylightDelta, rule.BaseUtcOffsetDelta);
-        // }
-        // else
-        // {
-        startTime = TransitionTimeToDateTime(year, rule.DaylightTransitionStart);
-        endTime = TransitionTimeToDateTime(year, rule.DaylightTransitionEnd);
-        // }
+        if (rule.NoDaylightTransitionsField())
+        {
+            // NoDaylightTransitions rules don't use DaylightTransition Start and End, instead
+            // the DateStart and DateEnd are UTC times that represent when daylight savings time changes.
+            // Convert the UTC times into adjusted time zone times.
+
+            // use the previous rule to calculate the startTime, since the DST change happens w.r.t. the previous rule
+            TimeZoneInfo.AdjustmentRule previousRule = GetPreviousAdjustmentRule(rule, ruleIndex);
+            startTime = ConvertFromUtc(rule.DateStart, previousRule.DaylightDelta, previousRule.BaseUtcOffsetDelta);
+
+            endTime = ConvertFromUtc(rule.DateEnd, rule.DaylightDelta, rule.BaseUtcOffsetDelta);
+        }
+        else
+        {
+            startTime = TransitionTimeToDateTime(year, rule.DaylightTransitionStart);
+            endTime = TransitionTimeToDateTime(year, rule.DaylightTransitionEnd);
+        }
+
         return new DaylightTimeStruct(startTime, endTime, delta);
     }
 
@@ -223,7 +217,8 @@ public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
         return result;
     }
 
-    private static bool GetIsInvalidTime(DateTime time, TimeZoneInfo.AdjustmentRule? rule, DaylightTimeStruct daylightTime)
+    private static bool GetIsInvalidTime(DateTime time, TimeZoneInfo.AdjustmentRule? rule,
+        DaylightTimeStruct daylightTime)
     {
         bool isInvalid = false;
         if (rule == null || rule.DaylightDelta == TimeSpan.Zero)
