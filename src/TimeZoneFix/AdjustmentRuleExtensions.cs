@@ -5,24 +5,16 @@ namespace TimeZoneFix;
 public static class AdjustmentRuleExtensions
 {
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_noDaylightTransitions")]
-    public static extern ref bool NoDaylightTransitions(this TimeZoneInfo.AdjustmentRule @this);
+    public static extern ref bool NoDaylightTransitionsField(this TimeZoneInfo.AdjustmentRule @this);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_HasDaylightSaving")]
+    public static extern bool HasDaylightSaving(this TimeZoneInfo.AdjustmentRule @this);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "IsStartDateMarkerForBeginningOfYear")]
+    public static extern bool IsStartDateMarkerForBeginningOfYear(this TimeZoneInfo.AdjustmentRule @this);
     
-    public static bool HasDaylightSaving(this TimeZoneInfo.AdjustmentRule rule)
-    {
-        return rule.DaylightDelta != TimeSpan.Zero ||
-               (rule.DaylightTransitionStart != default &&
-                rule.DaylightTransitionStart.TimeOfDay != DateTime.MinValue) ||
-               (rule.DaylightTransitionEnd != default &&
-                rule.DaylightTransitionEnd.TimeOfDay != DateTime.MinValue.AddMilliseconds(1));
-    }
-
-    public static bool IsStartDateMarkerForBeginningOfYear(this TimeZoneInfo.AdjustmentRule rule) =>
-        rule.DaylightTransitionStart.Month == 1 && rule.DaylightTransitionStart.Day == 1 &&
-        rule.DaylightTransitionStart.TimeOfDay.TimeOfDay.Ticks < TimeSpan.TicksPerSecond;
-
-    public static bool IsEndDateMarkerForEndOfYear(this TimeZoneInfo.AdjustmentRule rule) =>
-        rule.DaylightTransitionEnd.Month == 1 && rule.DaylightTransitionEnd.Day == 1 &&
-        rule.DaylightTransitionEnd.TimeOfDay.TimeOfDay.Ticks < TimeSpan.TicksPerSecond;
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "IsEndDateMarkerForEndOfYear")]
+    public static extern bool IsEndDateMarkerForEndOfYear(this TimeZoneInfo.AdjustmentRule @this);
 
     public static string ToFormattedString(this TimeZoneInfo.AdjustmentRule rule)
     {
@@ -30,7 +22,7 @@ public static class AdjustmentRuleExtensions
                $"DateEnd: {rule.DateEnd:yyyy-MM-dd}, " +
                $"DaylightDelta: {rule.DaylightDelta}, " +
                $"BaseUtcOffsetDelta: {rule.BaseUtcOffsetDelta}, " +
-               $"NoDaylightTransitions: {NoDaylightTransitions(rule)}, " +
+               $"NoDaylightTransitions: {NoDaylightTransitionsField(rule)}, " +
                $"DaylightTransitionStart: {TransitionTimeToString(rule.DaylightTransitionStart)}, " +
                $"DaylightTransitionEnd: {TransitionTimeToString(rule.DaylightTransitionEnd)}";
     }
@@ -46,7 +38,8 @@ public static class AdjustmentRuleExtensions
         else
         {
             // Example: "Month: 3, Week: 2, DayOfWeek: Sunday, TimeOfDay: 02:00:00"
-            return $"Month: {tt.Month:00}, Week: {tt.Week}, DayOfWeek: {tt.DayOfWeek}, TimeOfDay: {tt.TimeOfDay:HH:mm:ss.FFFF}";
+            return
+                $"Month: {tt.Month:00}, Week: {tt.Week}, DayOfWeek: {tt.DayOfWeek}, TimeOfDay: {tt.TimeOfDay:HH:mm:ss.FFFF}";
         }
     }
 }
