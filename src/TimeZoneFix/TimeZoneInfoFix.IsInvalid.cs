@@ -6,7 +6,7 @@ namespace TimeZoneFix;
 /// This class mimics a TimeZoneInfo while fixing some of its behavior regarding IsInvalidTime.
 /// </summary>
 /// <param name="timeZone">the time zone to fix</param>
-public class TimeZoneInfoFix(TimeZoneInfo timeZone)
+public partial class TimeZoneInfoFix(TimeZoneInfo timeZone)
 {
     private readonly TimeZoneInfo.AdjustmentRule[]? _adjustmentRules = timeZone.GetAdjustmentRules();
     private TimeSpan BaseUtcOffset => timeZone.BaseUtcOffset;
