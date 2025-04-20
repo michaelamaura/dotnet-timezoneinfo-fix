@@ -20,7 +20,11 @@ public class TimeZoneInfoTests
         // Valid time in Berlin
         { new DateTime(2025, 4, 19, 15, 0, 0), "Europe/Berlin", false },
         // should not be invalid, but BCL DateTimeZone detects it to be invalid
-        { new DateTime(1995, 3, 26, 3, 0, 0), "Europe/Lisbon", false }
+        { new DateTime(1995, 3, 26, 3, 0, 0), "Europe/Lisbon", false },
+        // Kiritimati skipped the whole day of Dec 31st in 1994 due to an offset change
+        { new DateTime(1994, 12, 31, 0, 0, 0), "Pacific/Kiritimati", true },
+        { new DateTime(1994, 12, 31, 12, 0, 0), "Pacific/Kiritimati", true },
+        { new DateTime(1994, 12, 31, 12, 23, 59), "Pacific/Kiritimati", true },
     };
 
     public static TheoryData<DateTime, string, bool> AmbiguousTimeTestData => new()

@@ -2,22 +2,6 @@ namespace TimeZoneFix;
 
 public partial class TimeZoneInfoFix
 {
-   
-    /// <summary>
-    /// Returns true if the time is during the ambiguous time period
-    /// for the current TimeZoneInfo instance.
-    /// </summary>
-    public bool IsAmbiguousTime(DateTimeOffset dateTimeOffset)
-    {
-        if (!_supportsDaylightSavingTime)
-        {
-            return false;
-        }
-
-        DateTimeOffset adjustedTime = ConvertTime(dateTimeOffset, this);
-        return IsAmbiguousTime(adjustedTime.DateTime);
-    }
-
     /// <summary>
     /// Returns true if the time is during the ambiguous time period
     /// for the current TimeZoneInfo instance.
@@ -48,6 +32,7 @@ public partial class TimeZoneInfoFix
             DaylightTimeStruct daylightTime = GetDaylightTime(adjustedTime.Year, rule, ruleIndex);
             return GetIsAmbiguousTime(adjustedTime, rule, daylightTime);
         }
+
         return false;
     }
 
