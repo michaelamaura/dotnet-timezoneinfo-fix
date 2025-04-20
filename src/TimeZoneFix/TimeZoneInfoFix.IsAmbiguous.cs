@@ -1,19 +1,34 @@
-using System.Collections.ObjectModel;
-
 namespace TimeZoneFix;
 
 public partial class TimeZoneInfoFix
 {
-    [Flags]
-    internal enum TimeZoneInfoOptions
+   
+    /// <summary>
+    /// Returns true if the time is during the ambiguous time period
+    /// for the current TimeZoneInfo instance.
+    /// </summary>
+    public bool IsAmbiguousTime(DateTimeOffset dateTimeOffset)
     {
-        None = 1,
-        NoThrowOnInvalidTime = 2
+        if (!_supportsDaylightSavingTime)
+        {
+            return false;
+        }
+
+        DateTimeOffset adjustedTime = ConvertTime(dateTimeOffset, this);
+        return IsAmbiguousTime(adjustedTime.DateTime);
     }
 
+    /// <summary>
+    /// Returns true if the time is during the ambiguous time period
+    /// for the current TimeZoneInfo instance.
+    /// </summary>
     public bool IsAmbiguousTime(DateTime dateTime) =>
         IsAmbiguousTime(dateTime, TimeZoneInfoOptions.NoThrowOnInvalidTime);
 
+    /// <summary>
+    /// Returns true if the time is during the ambiguous time period
+    /// for the current TimeZoneInfo instance.
+    /// </summary>
     internal bool IsAmbiguousTime(DateTime dateTime, TimeZoneInfoOptions flags)
     {
         if (!_supportsDaylightSavingTime)
@@ -21,10 +36,10 @@ public partial class TimeZoneInfoFix
             return false;
         }
 
-        //CachedData cachedData = s_cachedData;
+        CachedData cachedData = s_cachedData;
         DateTime adjustedTime =
-            //dateTime.Kind == DateTimeKind.Local ? ConvertTime(dateTime, cachedData.Local, this, flags, cachedData) :
-            //dateTime.Kind == DateTimeKind.Utc ? ConvertTime(dateTime, s_utcTimeZone, this, flags, cachedData) :
+            dateTime.Kind == DateTimeKind.Local ? ConvertTime(dateTime, cachedData.Local, this, flags, cachedData) :
+            dateTime.Kind == DateTimeKind.Utc ? ConvertTime(dateTime, s_utcTimeZone, this, flags, cachedData) :
             dateTime;
 
         TimeZoneInfo.AdjustmentRule? rule = GetAdjustmentRuleForTime(adjustedTime, out int? ruleIndex);
@@ -33,7 +48,6 @@ public partial class TimeZoneInfoFix
             DaylightTimeStruct daylightTime = GetDaylightTime(adjustedTime.Year, rule, ruleIndex);
             return GetIsAmbiguousTime(adjustedTime, rule, daylightTime);
         }
-
         return false;
     }
 
@@ -107,5 +121,12 @@ public partial class TimeZoneInfoFix
         }
 
         return isAmbiguous;
+    }
+
+    [Flags]
+    internal enum TimeZoneInfoOptions
+    {
+        None = 1,
+        NoThrowOnInvalidTime = 2
     }
 }

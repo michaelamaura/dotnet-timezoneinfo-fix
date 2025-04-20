@@ -5,8 +5,8 @@ namespace TimeZoneFix;
 /// </summary>
 public partial class TimeZoneInfoFix
 {
-    private readonly TimeZoneInfo.AdjustmentRule[]? _adjustmentRules;
     private readonly TimeZoneInfo _timeZone;
+    private readonly TimeZoneInfo.AdjustmentRule[]? _adjustmentRules;
     private readonly bool _supportsDaylightSavingTime;
 
     /// <summary>
@@ -20,5 +20,12 @@ public partial class TimeZoneInfoFix
         _supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime;
     }
 
-    private TimeSpan BaseUtcOffset => _timeZone.BaseUtcOffset;
+    private TimeZoneInfo.AdjustmentRule? GetAdjustmentRuleForTime(DateTime dateTime, out int? ruleIndex) =>
+        _timeZone.GetAdjustmentRuleForTime(dateTime, out ruleIndex);
+
+    private DateTime ConvertFromUtc(DateTime dateTime, TimeSpan daylightDelta, TimeSpan baseUtcOffsetDelta) =>
+        _timeZone.ConvertFromUtc(dateTime, daylightDelta, baseUtcOffsetDelta);
+
+    private TimeZoneInfo.AdjustmentRule GetPreviousAdjustmentRule(TimeZoneInfo.AdjustmentRule rule, int? ruleIndex) =>
+        _timeZone.GetPreviousAdjustmentRule(rule, ruleIndex);
 }

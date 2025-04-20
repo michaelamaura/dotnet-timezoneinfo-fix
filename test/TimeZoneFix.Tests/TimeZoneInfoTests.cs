@@ -20,44 +20,8 @@ public class TimeZoneInfoTests
         // Valid time in Berlin
         { new DateTime(2025, 4, 19, 15, 0, 0), "Europe/Berlin", false },
         // should not be invalid, but BCL DateTimeZone detects it to be invalid
-        { new DateTime(1995, 3, 26, 3, 0, 0), "Europe/Lisbon", false },
+        { new DateTime(1995, 3, 26, 3, 0, 0), "Europe/Lisbon", false }
     };
-
-    [Theory]
-    [MemberData(nameof(InvalidTimeTestData))]
-    public void IsInvalidTime_WithBclTimeZoneInfo(
-        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
-    {
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-        timeZone.IsInvalidTime(testTime).Should().Be(expectedIsInvalid);
-    }
-    
-    [Theory]
-    [MemberData(nameof(InvalidTimeTestData))]
-    public void IsInvalidTime_WithTimeZoneInfoFix(
-        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
-    {
-        var timeZone = new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
-        timeZone.IsInvalidTime(testTime).Should().Be(expectedIsInvalid);
-    }
-    
-    [Theory]
-    [MemberData(nameof(InvalidTimeTestData))]
-    public void IsInvalidTime_WithNodaDateTimeZone_WithTzDb(
-        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
-    {
-        var timeZone = DateTimeZoneProviders.Tzdb[timeZoneId];
-        timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsInvalid ? 0 : 1);
-    }
-    
-    [Theory]
-    [MemberData(nameof(InvalidTimeTestData))]
-    public void IsInvalidTime_WithNodaDateTimeZone_WithBcl(
-        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
-    {
-        var timeZone = DateTimeZoneProviders.Bcl[timeZoneId];
-        timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsInvalid ? 0 : 1);
-    }
 
     public static TheoryData<DateTime, string, bool> AmbiguousTimeTestData => new()
     {
@@ -78,6 +42,42 @@ public class TimeZoneInfoTests
     };
 
     [Theory]
+    [MemberData(nameof(InvalidTimeTestData))]
+    public void IsInvalidTime_WithBclTimeZoneInfo(
+        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
+    {
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        timeZone.IsInvalidTime(testTime).Should().Be(expectedIsInvalid);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidTimeTestData))]
+    public void IsInvalidTime_WithTimeZoneInfoFix(
+        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
+    {
+        var timeZone = new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
+        timeZone.IsInvalidTime(testTime).Should().Be(expectedIsInvalid);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidTimeTestData))]
+    public void IsInvalidTime_WithNodaDateTimeZone_WithTzDb(
+        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
+    {
+        var timeZone = DateTimeZoneProviders.Tzdb[timeZoneId];
+        timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsInvalid ? 0 : 1);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidTimeTestData))]
+    public void IsInvalidTime_WithNodaDateTimeZone_WithBcl(
+        DateTime testTime, string timeZoneId, bool expectedIsInvalid)
+    {
+        var timeZone = DateTimeZoneProviders.Bcl[timeZoneId];
+        timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsInvalid ? 0 : 1);
+    }
+
+    [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
     public void IsAmbiguousTime_WithBclTimeZoneInfo(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
@@ -85,16 +85,16 @@ public class TimeZoneInfoTests
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
         timeZone.IsAmbiguousTime(testTime).Should().Be(expectedIsAmbiguous);
     }
-    
+
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
     public void IsAmbiguousTime_WithTimeZoneInfoFix(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
-        var timeZone =  new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
+        var timeZone = new TimeZoneInfoFix(TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
         timeZone.IsAmbiguousTime(testTime).Should().Be(expectedIsAmbiguous);
     }
-    
+
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
     public void IsAmbiguousTime_WithNodaDateTimeZone_WithTzDb(
@@ -103,7 +103,7 @@ public class TimeZoneInfoTests
         var timeZone = DateTimeZoneProviders.Tzdb[timeZoneId];
         timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsAmbiguous ? 2 : 1);
     }
-    
+
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
     public void IsAmbiguousTime_WithNodaDateTimeZone_WithBcl(
@@ -112,5 +112,4 @@ public class TimeZoneInfoTests
         var timeZone = DateTimeZoneProviders.Bcl[timeZoneId];
         timeZone.MapLocal(LocalDateTime.FromDateTime(testTime)).Count.Should().Be(expectedIsAmbiguous ? 2 : 1);
     }
-
 }

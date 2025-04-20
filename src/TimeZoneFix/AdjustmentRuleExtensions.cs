@@ -12,7 +12,7 @@ public static class AdjustmentRuleExtensions
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "IsStartDateMarkerForBeginningOfYear")]
     public static extern bool IsStartDateMarkerForBeginningOfYear(this TimeZoneInfo.AdjustmentRule @this);
-    
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "IsEndDateMarkerForEndOfYear")]
     public static extern bool IsEndDateMarkerForEndOfYear(this TimeZoneInfo.AdjustmentRule @this);
 
