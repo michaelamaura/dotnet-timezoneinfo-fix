@@ -6,7 +6,7 @@ namespace TimeZoneFix;
 public partial class TimeZoneInfoFix
 {
     private readonly TimeZoneInfo _timeZone;
-    private readonly TimeZoneInfo.AdjustmentRule[]? _adjustmentRules;
+    private readonly TimeZoneInfo.AdjustmentRule[] _adjustmentRules;
     private readonly bool _supportsDaylightSavingTime;
 
     /// <summary>
@@ -16,7 +16,7 @@ public partial class TimeZoneInfoFix
     public TimeZoneInfoFix(TimeZoneInfo timeZone)
     {
         _timeZone = timeZone;
-        _adjustmentRules = timeZone.AdjustmentRulesField();
+        _adjustmentRules = timeZone.AdjustmentRulesField() ?? throw new NullReferenceException();
         _supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime;
     }
 

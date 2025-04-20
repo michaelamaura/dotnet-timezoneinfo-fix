@@ -1,8 +1,9 @@
+// ReSharper disable InconsistentNaming
 namespace TimeZoneFix;
 
 public partial class TimeZoneInfoFix
 {
-    private CachedData s_cachedData = null!;
+    private readonly CachedData s_cachedData = null!;
     private static readonly TimeZoneInfo s_utcTimeZone = null!;
 
     private DaylightTimeStruct GetDaylightTime(int year, TimeZoneInfo.AdjustmentRule rule, int? ruleIndex)
@@ -32,7 +33,7 @@ public partial class TimeZoneInfoFix
     }
 
 
-    internal static DateTime TransitionTimeToDateTime(int year, TimeZoneInfo.TransitionTime transitionTime)
+    private static DateTime TransitionTimeToDateTime(int year, TimeZoneInfo.TransitionTime transitionTime)
     {
         DateTime value;
         var timeOfDay = transitionTime.TimeOfDay.TimeOfDay;

@@ -86,3 +86,25 @@ Console.WriteLine(
 var portugalChangeIn1992 = new DateTime(1992, 9, 27, 1, 30, 0);
 Console.WriteLine(
     $"IsAmbiguousTime({portugalChangeIn1992:yyyy-MM-dd'T'HH:mm:ss}): {portugalTz.IsAmbiguousTime(portugalChangeIn1992)}");
+
+Console.WriteLine();
+Console.WriteLine("---");
+Console.WriteLine();
+
+var kiritimatiTz = TimeZoneInfo.FindSystemTimeZoneById("Pacific/Kiritimati");
+
+foreach (var rule in kiritimatiTz.GetAdjustmentRules())
+{
+    Console.WriteLine(rule.ToFormattedString());
+}
+
+Console.WriteLine();
+Console.WriteLine("---");
+Console.WriteLine();
+
+var timeZones = TimeZoneInfo.GetSystemTimeZones().OrderBy(x => x.Id);
+foreach (var timeZone in timeZones)
+{
+    var anyNoTransitions = timeZone.AdjustmentRulesField()?.Any(r => r.NoDaylightTransitionsField());
+    Console.WriteLine($"{timeZone.Id}, {anyNoTransitions}");
+}
