@@ -25,6 +25,8 @@ public class TimeZoneInfoTests
         { new DateTime(1994, 12, 31, 0, 0, 0), "Pacific/Kiritimati", true },
         { new DateTime(1994, 12, 31, 12, 0, 0), "Pacific/Kiritimati", true },
         { new DateTime(1994, 12, 31, 12, 23, 59), "Pacific/Kiritimati", true },
+        // Moscow switched to UTC+4 in 2011
+        { new DateTime(2011, 3, 27, 2, 0, 0), "Europe/Moscow", true },
     };
 
     public static TheoryData<DateTime, string, bool> AmbiguousTimeTestData => new()
@@ -42,7 +44,9 @@ public class TimeZoneInfoTests
         // DST end in New York (ambiguous)
         { new DateTime(2023, 11, 5, 1, 30, 0), "America/New_York", true },
         // Normal DST time in Berlin (not ambiguous)
-        { new DateTime(2023, 7, 15, 12, 0, 0), "Europe/Berlin", false }
+        { new DateTime(2023, 7, 15, 12, 0, 0), "Europe/Berlin", false },
+        // Moscow switched to UTC+3 in 2014
+        { new DateTime(2014, 10, 26, 1, 0, 0), "Europe/Moscow", true },
     };
 
     [Theory]
