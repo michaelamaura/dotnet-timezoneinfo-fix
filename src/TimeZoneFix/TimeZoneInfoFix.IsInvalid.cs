@@ -12,7 +12,7 @@ public partial class TimeZoneInfoFix
             // only check Unspecified and (Local when this TimeZoneInfo instance is Local)
             TimeZoneInfo.AdjustmentRule? rule = GetAdjustmentRuleForTime(dateTime, out int? ruleIndex);
 
-            if (rule != null && rule.HasDaylightSaving())
+            if (rule != null)
             {
                 DaylightTimeStruct daylightTime = GetDaylightTime(dateTime.Year, rule, ruleIndex);
                 isInvalid = GetIsInvalidTime(dateTime, rule, daylightTime);

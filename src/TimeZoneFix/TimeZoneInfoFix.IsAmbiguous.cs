@@ -27,7 +27,7 @@ public partial class TimeZoneInfoFix
             dateTime;
 
         TimeZoneInfo.AdjustmentRule? rule = GetAdjustmentRuleForTime(adjustedTime, out int? ruleIndex);
-        if (rule != null && rule.HasDaylightSaving())
+        if (rule != null)
         {
             DaylightTimeStruct daylightTime = GetDaylightTime(adjustedTime.Year, rule, ruleIndex);
             return GetIsAmbiguousTime(adjustedTime, rule, daylightTime);
