@@ -102,6 +102,18 @@ Console.WriteLine();
 Console.WriteLine("---");
 Console.WriteLine();
 
+
+var berlinTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
+
+foreach (var rule in berlinTz.GetAdjustmentRules().Where(r => r.DateStart.Year is >= 2023 and <= 2026))
+{
+    Console.WriteLine(rule.ToFormattedString());
+}
+
+Console.WriteLine();
+Console.WriteLine("---");
+Console.WriteLine();
+
 var timeZones = TimeZoneInfo.GetSystemTimeZones().OrderBy(x => x.Id);
 foreach (var timeZone in timeZones)
 {

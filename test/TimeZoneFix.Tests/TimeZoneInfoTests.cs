@@ -7,8 +7,6 @@ public class TimeZoneInfoTests
 {
     public static TheoryData<DateTime, string, bool> InvalidTimeTestData => new()
     {
-        // Paraguay DST start (invalid time)
-        { new DateTime(2024, 10, 6, 0, 0, 0), "America/Asuncion", true },
         // Berlin DST start (invalid time)
         { new DateTime(2025, 3, 30, 2, 30, 0), "Europe/Berlin", true },
         // Lisbon DST start (invalid time)
@@ -19,8 +17,17 @@ public class TimeZoneInfoTests
         { new DateTime(2024, 10, 6, 1, 0, 0), "America/Asuncion", false },
         // Valid time in Berlin
         { new DateTime(2025, 4, 19, 15, 0, 0), "Europe/Berlin", false },
+        // is invalid and is detected as invalid
+        { new DateTime(1997, 3, 30, 1, 0, 0), "Europe/Lisbon", true },
+    };
+    
+    public static TheoryData<DateTime, string, bool> InvalidTimeTestDataIncorrectInBcl => new()
+    {
+        // Paraguay DST start (invalid time)
+        { new DateTime(2024, 10, 6, 0, 0, 0), "America/Asuncion", true },
         // should not be invalid, but BCL DateTimeZone detects it to be invalid
         { new DateTime(1995, 3, 26, 3, 0, 0), "Europe/Lisbon", false },
+        { new DateTime(1996, 3, 31, 2, 0, 0), "Europe/Lisbon", false },
         // Kiritimati skipped the whole day of Dec 31st in 1994 due to an offset change
         { new DateTime(1994, 12, 31, 0, 0, 0), "Pacific/Kiritimati", true },
         { new DateTime(1994, 12, 31, 12, 0, 0), "Pacific/Kiritimati", true },
@@ -37,20 +44,31 @@ public class TimeZoneInfoTests
         { new DateTime(2023, 10, 29, 1, 30, 0), "Europe/London", true },
         // DST end in Lisbon (ambiguous)
         { new DateTime(2023, 10, 29, 1, 30, 0), "Europe/Lisbon", true },
-        // DST end in Lisbon (not ambiguous due to time zone switch at the same time)
-        { new DateTime(1992, 9, 27, 1, 30, 0), "Europe/Lisbon", false },
+        // DST end in Lisbon 1995
+        { new DateTime(1995, 9, 24, 2, 00, 0), "Europe/Lisbon", true },
+        { new DateTime(1995, 9, 24, 2, 30, 0), "Europe/Lisbon", true },
+        { new DateTime(1995, 9, 24, 3, 00, 0), "Europe/Lisbon", false },
         // After DST transition in Berlin (not ambiguous)
         { new DateTime(2023, 10, 29, 3, 0, 0), "Europe/Berlin", false },
         // DST end in New York (ambiguous)
         { new DateTime(2023, 11, 5, 1, 30, 0), "America/New_York", true },
         // Normal DST time in Berlin (not ambiguous)
         { new DateTime(2023, 7, 15, 12, 0, 0), "Europe/Berlin", false },
+    };
+    
+    public static TheoryData<DateTime, string, bool> AmbiguousTimeTestDataIncorrectInBcl => new()
+    {
+        // DST end in Lisbon (not ambiguous due to time zone switch at the same time)
+        { new DateTime(1992, 9, 27, 1, 30, 0), "Europe/Lisbon", false },
+        // DST end in Lisbon 1995
+        { new DateTime(1995, 9, 24, 1, 00, 0), "Europe/Lisbon", false },
         // Moscow switched to UTC+3 in 2014
         { new DateTime(2014, 10, 26, 1, 0, 0), "Europe/Moscow", true },
     };
 
     [Theory]
     [MemberData(nameof(InvalidTimeTestData))]
+    [MemberData(nameof(InvalidTimeTestDataIncorrectInBcl))]
     public void IsInvalidTime_WithBclTimeZoneInfo(
         DateTime testTime, string timeZoneId, bool expectedIsInvalid)
     {
@@ -60,6 +78,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(InvalidTimeTestData))]
+    [MemberData(nameof(InvalidTimeTestDataIncorrectInBcl))]
     public void IsInvalidTime_WithTimeZoneInfoFix(
         DateTime testTime, string timeZoneId, bool expectedIsInvalid)
     {
@@ -69,6 +88,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(InvalidTimeTestData))]
+    [MemberData(nameof(InvalidTimeTestDataIncorrectInBcl))]
     public void IsInvalidTime_WithNodaDateTimeZone_WithTzDb(
         DateTime testTime, string timeZoneId, bool expectedIsInvalid)
     {
@@ -78,6 +98,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(InvalidTimeTestData))]
+    [MemberData(nameof(InvalidTimeTestDataIncorrectInBcl))]
     public void IsInvalidTime_WithNodaDateTimeZone_WithBcl(
         DateTime testTime, string timeZoneId, bool expectedIsInvalid)
     {
@@ -87,6 +108,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
+    [MemberData(nameof(AmbiguousTimeTestDataIncorrectInBcl))]
     public void IsAmbiguousTime_WithBclTimeZoneInfo(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
@@ -96,6 +118,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
+    [MemberData(nameof(AmbiguousTimeTestDataIncorrectInBcl))]
     public void IsAmbiguousTime_WithTimeZoneInfoFix(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
@@ -105,6 +128,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
+    [MemberData(nameof(AmbiguousTimeTestDataIncorrectInBcl))]
     public void IsAmbiguousTime_WithNodaDateTimeZone_WithTzDb(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
@@ -114,6 +138,7 @@ public class TimeZoneInfoTests
 
     [Theory]
     [MemberData(nameof(AmbiguousTimeTestData))]
+    [MemberData(nameof(AmbiguousTimeTestDataIncorrectInBcl))]
     public void IsAmbiguousTime_WithNodaDateTimeZone_WithBcl(
         DateTime testTime, string timeZoneId, bool expectedIsAmbiguous)
     {
